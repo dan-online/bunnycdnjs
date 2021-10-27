@@ -1,6 +1,6 @@
 {
-  "name": "bunnyjs",
-  "version": "1.0.0",
+  "name": "bunnycdnjs",
+  "version": "1.0.2",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -12,8 +12,8 @@
     "type": "git",
     "url": "git+https://github.com/iKaio/bunnyjs.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["bunnycdn", "cdn"],
+  "author": "iKaio",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/iKaio/bunnyjs/issues"
