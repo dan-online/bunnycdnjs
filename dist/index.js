@@ -40,7 +40,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BunnyStorageClient = void 0;
-var axios_1 = __importDefault(require("axios"));
+var fs_1 = __importDefault(require("fs"));
+var request_1 = __importDefault(require("request"));
+var path_1 = __importDefault(require("path"));
 var GeneralEndPoint = "https://storage.bunnycdn.com";
 var LocationsEndpoints = {
     Falkenstein: "https://storage.bunnycdn.com",
@@ -56,22 +58,87 @@ var BunnyStorageClient = /** @class */ (function () {
     }
     BunnyStorageClient.prototype.List = function (path) {
         return __awaiter(this, void 0, void 0, function () {
-            var url, res;
+            var url;
+            var _this = this;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        url = GeneralEndPoint + "/" + this.storageZoneName + "/" + path;
-                        return [4 /*yield*/, axios_1.default.get(url, {
-                                method: "GET",
-                                headers: {
-                                    AccessKey: this.apiKey,
-                                    Accept: "*/*",
-                                },
-                            })];
-                    case 1:
-                        res = _a.sent();
-                        return [2 /*return*/, res.data];
+                url = GeneralEndPoint + "/" + this.storageZoneName + "/" + path;
+                return [2 /*return*/, new Promise(function (resolve) {
+                        var options = {
+                            method: "GET",
+                            headers: {
+                                AccessKey: _this.apiKey,
+                                Accept: "*/*",
+                            },
+                        };
+                        var handle = function (err, res, body) {
+                            resolve(JSON.parse(body));
+                        };
+                        (0, request_1.default)(url, options, handle);
+                    })];
+            });
+        });
+    };
+    BunnyStorageClient.prototype.Upload = function (path, filename, content) {
+        return __awaiter(this, void 0, void 0, function () {
+            var url;
+            var _this = this;
+            return __generator(this, function (_a) {
+                url = GeneralEndPoint + "/" + this.storageZoneName + "/" + path + "/" + filename;
+                return [2 /*return*/, new Promise(function (resolve) {
+                        var options = {
+                            method: "PUT",
+                            headers: {
+                                AccessKey: _this.apiKey,
+                            },
+                            body: content,
+                        };
+                        var handle = function (err, res, body) {
+                            resolve(JSON.parse(body));
+                        };
+                        (0, request_1.default)(url, options, handle);
+                    })];
+            });
+        });
+    };
+    BunnyStorageClient.prototype.Download = function (path, filename, outputFilePath, outputFileName) {
+        return __awaiter(this, void 0, void 0, function () {
+            var url, toSavePath, toSaveFilename, toSaveFullPath;
+            var _this = this;
+            return __generator(this, function (_a) {
+                url = GeneralEndPoint + "/" + this.storageZoneName + "/" + path + "/" + filename;
+                toSavePath = "downloads";
+                toSaveFilename = "untitled";
+                if (outputFilePath && outputFileName) {
+                    toSavePath = outputFilePath;
+                    toSaveFilename = outputFileName;
                 }
+                else {
+                    toSavePath = path_1.default.join("downloads", path);
+                    toSaveFilename = filename;
+                }
+                if (!fs_1.default.existsSync(toSavePath)) {
+                    fs_1.default.mkdirSync(toSavePath, { recursive: true });
+                }
+                toSaveFullPath = path_1.default.join(toSavePath, toSaveFilename);
+                return [2 /*return*/, new Promise(function (resolve) {
+                        var options = {
+                            method: "GET",
+                            headers: {
+                                AccessKey: _this.apiKey,
+                            },
+                        };
+                        var req = (0, request_1.default)(url, options);
+                        var FileStream = fs_1.default.createWriteStream(toSaveFullPath);
+                        req.pipe(FileStream);
+                        FileStream.once("finish", function () {
+                            resolve(true);
+                            FileStream.close();
+                        });
+                        FileStream.once("error", function () {
+                            resolve(false);
+                            FileStream.close();
+                        });
+                    })];
             });
         });
     };
