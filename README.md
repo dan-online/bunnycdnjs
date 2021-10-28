@@ -1,4 +1,5 @@
-BunnyJS is a unoficial NodeJS client for the BunnyCDN API.
+# BunnyJS / BunnyCDNJS
+is a unoficial NodeJS client for the BunnyCDN API.
 
 # Why ?
 
@@ -8,24 +9,42 @@ I always use BunnyCDN in my projects, but there's no oficial library for NodeJS,
 
 With NPM:
 ```cli
-npm i 
+npm i bunnycdnjs
 ```
 
-# Usage
+yarn soon, sorry
+
+# Get started
 
 Using Require:
 ```js
 const { BunnyStorageClient } = require("bunnycdnjs");
+```
+
+Using Import:
+```ts
+import { BunnyStorageClient } from "bunnycdnjs";
+```
+
+# Usage
+
+```js
+// SECURITY ISSUE: USE ENVIRONMENT VARIABLES FOR API KEY !!!!!!!!!!!!!!
+// LEARN MORE: https://medium.com/chingu/an-introduction-to-environment-variables-and-how-to-use-them-f602f66d15fa
+
 const CDN = new BunnyStorageClient({
-  apiKey: YOUR_KEY_HERE, // eg: "5g5ednfd-3gcc-4c43-b33399ff9da7-cf89-4b3f"
-  storageZoneName: YOUR_STORAGE, // eg: "myassets"
+  apiKey: "5g5ednfd-3gcc-4c43-b33399ff9da7-cf89-4b3f",
+  storageZoneName: "myassets",
+  cdnLocation: "New York",
 });
 
-(async () => {
+async function ListMyStorageRootFolder() {
   let RootFiles = await CDN.List(".");
-  RootFiles.forEach((file) => {
-    console.log(file.ObjectName);
-  });
-})();
+  
+  for (const File of RootFiles) {
+    console.log(`Name: ${File.ObjectName} Size: ${File.Length}`);
+  }
+}
 
+ListMyStorageRootFolder();
 ```
