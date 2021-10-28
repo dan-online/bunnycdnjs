@@ -1,8 +1,9 @@
-export type EdgeLocations = "Falkenstein" | "New York" | "Los Angeles" | "Singapore" | "Sydney";
+export type EdgeLocations = "Main" | "Falkenstein" | "New York" | "Los Angeles" | "Singapore" | "Sydney";
 
 export interface BunnyStorageClientConstructor {
     storageZoneName: string;
     apiKey: string;
+    cdnLocation: EdgeLocations;
 }
 
 export interface StorageListItem {

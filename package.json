@@ -1,7 +1,7 @@
 {
   "name": "bunnycdnjs",
-  "version": "1.0.2",
-  "description": "",
+  "version": "1.0.3",
+  "description": "Tool for BunnyCDN",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -p .",

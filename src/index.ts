@@ -1,11 +1,14 @@
 import fs from "fs";
 import request from "request";
 import nodepath from "path";
-import { BunnyStorageClientConstructor, StorageListItem } from "./types";
-
-const GeneralEndPoint = "https://storage.bunnycdn.com";
+import {
+  BunnyStorageClientConstructor,
+  EdgeLocations,
+  StorageListItem,
+} from "./types";
 
 const LocationsEndpoints = {
+  Main: "https://storage.bunnycdn.com",
   Falkenstein: "https://storage.bunnycdn.com",
   "New York": "https://ny.storage.bunnycdn.com",
   "Los Angeles": "https://la.storage.bunnycdn.com",
@@ -16,14 +19,19 @@ const LocationsEndpoints = {
 export class BunnyStorageClient {
   apiKey: string;
   storageZoneName: string;
+  cdnLocation: EdgeLocations;
+
+  private endpoint: string;
 
   constructor(Options: BunnyStorageClientConstructor) {
     this.storageZoneName = Options.storageZoneName;
     this.apiKey = Options.apiKey;
+    this.cdnLocation = Options.cdnLocation;
+    this.endpoint = LocationsEndpoints[this.cdnLocation];
   }
 
   async List(path: string): Promise<StorageListItem[]> {
-    let url = `${GeneralEndPoint}/${this.storageZoneName}/${path}`;
+    let url = `${this.endpoint}/${this.storageZoneName}/${path}/`;
 
     return new Promise((resolve) => {
       let options: request.CoreOptions = {
@@ -43,7 +51,7 @@ export class BunnyStorageClient {
   }
 
   async Upload(path: string, filename: string, content: string | Buffer) {
-    let url = `${GeneralEndPoint}/${this.storageZoneName}/${path}/${filename}`;
+    let url = `${this.endpoint}/${this.storageZoneName}/${path}/${filename}`;
 
     return new Promise((resolve) => {
       let options: request.CoreOptions = {
@@ -68,7 +76,7 @@ export class BunnyStorageClient {
     outputFilePath?: string,
     outputFileName?: string
   ) {
-    let url = `${GeneralEndPoint}/${this.storageZoneName}/${path}/${filename}`;
+    let url = `${this.endpoint}/${this.storageZoneName}/${path}/${filename}`;
 
     let toSavePath = "downloads";
     let toSaveFilename = "untitled";
@@ -111,3 +119,6 @@ export class BunnyStorageClient {
     });
   }
 }
+
+
+export * from "./types";
