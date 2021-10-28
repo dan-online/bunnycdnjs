@@ -105,7 +105,16 @@ var BunnyStorageClient = /** @class */ (function () {
                             body: content,
                         };
                         var handle = function (err, res, body) {
-                            resolve(JSON.parse(body));
+                            try {
+                                var parsed = JSON.parse(body);
+                                resolve(parsed);
+                            }
+                            catch (err) {
+                                resolve({
+                                    HttpCode: 0,
+                                    Message: "Upload: Error parsing api response",
+                                });
+                            }
                         };
                         (0, request_1.default)(url, options, handle);
                     })];
@@ -141,15 +150,45 @@ var BunnyStorageClient = /** @class */ (function () {
                         };
                         var req = (0, request_1.default)(url, options);
                         var FileStream = fs_1.default.createWriteStream(toSaveFullPath);
-                        req.pipe(FileStream);
                         FileStream.once("finish", function () {
-                            resolve(true);
                             FileStream.close();
+                            resolve(true);
                         });
                         FileStream.once("error", function () {
-                            resolve(false);
                             FileStream.close();
+                            resolve(false);
                         });
+                        req.pipe(FileStream);
+                    })];
+            });
+        });
+    };
+    BunnyStorageClient.prototype.Delete = function (path, filename) {
+        return __awaiter(this, void 0, void 0, function () {
+            var url;
+            var _this = this;
+            return __generator(this, function (_a) {
+                url = this.endpoint + "/" + this.storageZoneName + "/" + path + "/" + filename;
+                return [2 /*return*/, new Promise(function (resolve) {
+                        var options = {
+                            method: "DELETE",
+                            headers: {
+                                AccessKey: _this.apiKey,
+                            },
+                        };
+                        var handle = function (err, res, body) {
+                            try {
+                                var parsed = JSON.parse(body);
+                                resolve(parsed);
+                            }
+                            catch (err) {
+                                resolve({
+                                    HttpCode: 0,
+                                    Message: "Delete: Error parsing api response",
+                                });
+                            }
+                        };
+                        (0, request_1.default)(url, options, handle);
                     })];
             });
         });

@@ -5,6 +5,7 @@ import {
   BunnyStorageClientConstructor,
   EdgeLocations,
   StorageListItem,
+  APIResponse,
 } from "./types";
 
 const LocationsEndpoints = {
@@ -50,7 +51,11 @@ export class BunnyStorageClient {
     });
   }
 
-  async Upload(path: string, filename: string, content: string | Buffer) {
+  async Upload(
+    path: string,
+    filename: string,
+    content: string | Buffer
+  ): Promise<APIResponse> {
     let url = `${this.endpoint}/${this.storageZoneName}/${path}/${filename}`;
 
     return new Promise((resolve) => {
@@ -63,7 +68,15 @@ export class BunnyStorageClient {
       };
 
       let handle: request.RequestCallback = (err, res, body) => {
-        resolve(JSON.parse(body));
+        try {
+          let parsed = JSON.parse(body);
+          resolve(parsed);
+        } catch (err) {
+          resolve({
+            HttpCode: 0,
+            Message: "Upload: Error parsing api response",
+          });
+        }
       };
 
       request(url, options, handle);
@@ -75,7 +88,7 @@ export class BunnyStorageClient {
     filename: string,
     outputFilePath?: string,
     outputFileName?: string
-  ) {
+  ): Promise<boolean> {
     let url = `${this.endpoint}/${this.storageZoneName}/${path}/${filename}`;
 
     let toSavePath = "downloads";
@@ -105,20 +118,47 @@ export class BunnyStorageClient {
 
       let req = request(url, options);
       let FileStream = fs.createWriteStream(toSaveFullPath);
-      req.pipe(FileStream);
-
+      
       FileStream.once("finish", () => {
-        resolve(true);
         FileStream.close();
+        resolve(true);
       });
 
-      FileStream.once("error", () => {
-        resolve(false);
+      FileStream.once("error", ()=>{
         FileStream.close();
-      });
+        resolve(false);
+      })
+
+      req.pipe(FileStream);
+    });
+  }
+
+  async Delete(path: string, filename: string): Promise<APIResponse> {
+    let url = `${this.endpoint}/${this.storageZoneName}/${path}/${filename}`;
+
+    return new Promise((resolve) => {
+      let options: request.CoreOptions = {
+        method: "DELETE",
+        headers: {
+          AccessKey: this.apiKey,
+        },
+      };
+
+      let handle: request.RequestCallback = (err, res, body) => {
+        try {
+          let parsed = JSON.parse(body);
+          resolve(parsed);
+        } catch (err) {
+          resolve({
+            HttpCode: 0,
+            Message: "Delete: Error parsing api response",
+          });
+        }
+      };
+
+      request(url, options, handle);
     });
   }
 }
-
 
 export * from "./types";

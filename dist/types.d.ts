@@ -21,4 +21,8 @@ export interface StorageListItem {
     Checksum: string;
     ReplicatedZones: string;
 }
+export interface APIResponse {
+    HttpCode: number;
+    Message: string;
+}
 //# sourceMappingURL=types.d.ts.map

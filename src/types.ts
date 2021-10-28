@@ -1,25 +1,36 @@
-export type EdgeLocations = "Main" | "Falkenstein" | "New York" | "Los Angeles" | "Singapore" | "Sydney";
+export type EdgeLocations =
+  | "Main"
+  | "Falkenstein"
+  | "New York"
+  | "Los Angeles"
+  | "Singapore"
+  | "Sydney";
 
 export interface BunnyStorageClientConstructor {
-    storageZoneName: string;
-    apiKey: string;
-    cdnLocation: EdgeLocations;
+  storageZoneName: string;
+  apiKey: string;
+  cdnLocation: EdgeLocations;
 }
 
 export interface StorageListItem {
-    Guid: string;
-    StorageZoneName: string;
-    Path: string;
-    ObjectName: string;
-    Length: number;
-    LastChanged: string;
-    ServerId: number;
-    ArrayNumber: number;
-    IsDirectory: boolean;
-    UserId: string;
-    ContentType: string;
-    DateCreated: string;
-    StorageZoneId: number;
-    Checksum: string;
-    ReplicatedZones: string;
+  Guid: string;
+  StorageZoneName: string;
+  Path: string;
+  ObjectName: string;
+  Length: number;
+  LastChanged: string;
+  ServerId: number;
+  ArrayNumber: number;
+  IsDirectory: boolean;
+  UserId: string;
+  ContentType: string;
+  DateCreated: string;
+  StorageZoneId: number;
+  Checksum: string;
+  ReplicatedZones: string;
+}
+
+export interface APIResponse {
+  HttpCode: number;
+  Message: string;
 }
