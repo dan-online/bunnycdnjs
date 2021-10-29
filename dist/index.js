@@ -83,7 +83,24 @@ var BunnyStorageClient = /** @class */ (function () {
                             },
                         };
                         var handle = function (err, res, body) {
-                            resolve(JSON.parse(body));
+                            var HttpResponse = res;
+                            var _Error = err;
+                            var IsLocalError = false;
+                            var Data;
+                            try {
+                                var parsed = JSON.parse(body);
+                                Data = parsed;
+                            }
+                            catch (err) {
+                                _Error = err;
+                                IsLocalError = true;
+                            }
+                            resolve({
+                                HttpResponse: HttpResponse,
+                                Error: _Error,
+                                IsLocalError: IsLocalError,
+                                Data: Data,
+                            });
                         };
                         (0, request_1.default)(url, options, handle);
                     })];
@@ -105,16 +122,24 @@ var BunnyStorageClient = /** @class */ (function () {
                             body: content,
                         };
                         var handle = function (err, res, body) {
+                            var HttpResponse = res;
+                            var _Error = err;
+                            var IsLocalError = false;
+                            var Data;
                             try {
                                 var parsed = JSON.parse(body);
-                                resolve(parsed);
+                                Data = parsed;
                             }
                             catch (err) {
-                                resolve({
-                                    HttpCode: 0,
-                                    Message: "Upload: Error parsing api response",
-                                });
+                                _Error = err;
+                                IsLocalError = true;
                             }
+                            resolve({
+                                HttpResponse: HttpResponse,
+                                Error: _Error,
+                                IsLocalError: IsLocalError,
+                                Data: Data,
+                            });
                         };
                         (0, request_1.default)(url, options, handle);
                     })];
@@ -148,15 +173,19 @@ var BunnyStorageClient = /** @class */ (function () {
                                 AccessKey: _this.apiKey,
                             },
                         };
-                        var req = (0, request_1.default)(url, options);
+                        var handle = function (err, res, body) {
+                            resolve({
+                                HttpResponse: res,
+                                Error: err
+                            });
+                        };
+                        var req = (0, request_1.default)(url, options, handle);
                         var FileStream = fs_1.default.createWriteStream(toSaveFullPath);
                         FileStream.once("finish", function () {
                             FileStream.close();
-                            resolve(true);
                         });
                         FileStream.once("error", function () {
                             FileStream.close();
-                            resolve(false);
                         });
                         req.pipe(FileStream);
                     })];
@@ -177,16 +206,27 @@ var BunnyStorageClient = /** @class */ (function () {
                             },
                         };
                         var handle = function (err, res, body) {
+                            var HttpResponse = res;
+                            var _Error = err;
+                            var IsLocalError = false;
+                            var Data;
                             try {
                                 var parsed = JSON.parse(body);
-                                resolve(parsed);
+                                var success = parsed.HttpCode == 200;
+                                if (!success) {
+                                    _Error = new Error(parsed.Message);
+                                }
                             }
                             catch (err) {
-                                resolve({
-                                    HttpCode: 0,
-                                    Message: "Delete: Error parsing api response",
-                                });
+                                _Error = err;
+                                IsLocalError = true;
                             }
+                            resolve({
+                                HttpResponse: HttpResponse,
+                                Error: _Error,
+                                IsLocalError: IsLocalError,
+                                Data: Data,
+                            });
                         };
                         (0, request_1.default)(url, options, handle);
                     })];

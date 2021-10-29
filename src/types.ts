@@ -1,3 +1,5 @@
+import request from "request";
+
 export type EdgeLocations =
   | "Main"
   | "Falkenstein"
@@ -30,7 +32,9 @@ export interface StorageListItem {
   ReplicatedZones: string;
 }
 
-export interface APIResponse {
-  HttpCode: number;
-  Message: string;
+export interface APIResponse<D> {
+  HttpResponse: request.Response;
+  Error?: Error;
+  IsLocalError?: boolean;
+  Data?: D;
 }

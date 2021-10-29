@@ -1,3 +1,4 @@
+import request from "request";
 export declare type EdgeLocations = "Main" | "Falkenstein" | "New York" | "Los Angeles" | "Singapore" | "Sydney";
 export interface BunnyStorageClientConstructor {
     storageZoneName: string;
@@ -21,8 +22,10 @@ export interface StorageListItem {
     Checksum: string;
     ReplicatedZones: string;
 }
-export interface APIResponse {
-    HttpCode: number;
-    Message: string;
+export interface APIResponse<D> {
+    HttpResponse: request.Response;
+    Error?: Error;
+    IsLocalError?: boolean;
+    Data?: D;
 }
 //# sourceMappingURL=types.d.ts.map

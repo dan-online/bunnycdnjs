@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs, { ReadStream } from "fs";
 import request from "request";
 import nodepath from "path";
 import {
@@ -31,7 +31,7 @@ export class BunnyStorageClient {
     this.endpoint = LocationsEndpoints[this.cdnLocation];
   }
 
-  async List(path: string): Promise<StorageListItem[]> {
+  async List(path: string): Promise<APIResponse<StorageListItem[]>> {
     let url = `${this.endpoint}/${this.storageZoneName}/${path}/`;
 
     return new Promise((resolve) => {
@@ -44,7 +44,25 @@ export class BunnyStorageClient {
       };
 
       let handle: request.RequestCallback = (err, res, body) => {
-        resolve(JSON.parse(body));
+        let HttpResponse = res;
+        let _Error = err;
+        let IsLocalError = false;
+        let Data;
+
+        try {
+          let parsed = JSON.parse(body);
+          Data = parsed;
+        } catch (err) {
+          _Error = err;
+          IsLocalError = true;
+        }
+
+        resolve({
+          HttpResponse,
+          Error: _Error,
+          IsLocalError,
+          Data,
+        });
       };
 
       request(url, options, handle);
@@ -54,8 +72,8 @@ export class BunnyStorageClient {
   async Upload(
     path: string,
     filename: string,
-    content: string | Buffer
-  ): Promise<APIResponse> {
+    content: string | ReadStream
+  ): Promise<APIResponse<any>> {
     let url = `${this.endpoint}/${this.storageZoneName}/${path}/${filename}`;
 
     return new Promise((resolve) => {
@@ -68,15 +86,25 @@ export class BunnyStorageClient {
       };
 
       let handle: request.RequestCallback = (err, res, body) => {
+        let HttpResponse = res;
+        let _Error = err;
+        let IsLocalError = false;
+        let Data;
+
         try {
           let parsed = JSON.parse(body);
-          resolve(parsed);
+          Data = parsed;
         } catch (err) {
-          resolve({
-            HttpCode: 0,
-            Message: "Upload: Error parsing api response",
-          });
+          _Error = err;
+          IsLocalError = true;
         }
+
+        resolve({
+          HttpResponse,
+          Error: _Error,
+          IsLocalError,
+          Data,
+        });
       };
 
       request(url, options, handle);
@@ -88,7 +116,7 @@ export class BunnyStorageClient {
     filename: string,
     outputFilePath?: string,
     outputFileName?: string
-  ): Promise<boolean> {
+  ): Promise<APIResponse<any>> {
     let url = `${this.endpoint}/${this.storageZoneName}/${path}/${filename}`;
 
     let toSavePath = "downloads";
@@ -116,24 +144,29 @@ export class BunnyStorageClient {
         },
       };
 
-      let req = request(url, options);
+      let handle: request.RequestCallback = (err, res, body) => {
+        resolve({
+          HttpResponse: res,
+          Error: err
+        })
+      };
+
+      let req = request(url, options, handle);
       let FileStream = fs.createWriteStream(toSaveFullPath);
-      
+
       FileStream.once("finish", () => {
         FileStream.close();
-        resolve(true);
       });
 
-      FileStream.once("error", ()=>{
+      FileStream.once("error", () => {
         FileStream.close();
-        resolve(false);
-      })
+      });
 
       req.pipe(FileStream);
     });
   }
 
-  async Delete(path: string, filename: string): Promise<APIResponse> {
+  async Delete(path: string, filename: string): Promise<APIResponse<any>> {
     let url = `${this.endpoint}/${this.storageZoneName}/${path}/${filename}`;
 
     return new Promise((resolve) => {
@@ -145,15 +178,29 @@ export class BunnyStorageClient {
       };
 
       let handle: request.RequestCallback = (err, res, body) => {
+        let HttpResponse = res;
+        let _Error = err;
+        let IsLocalError = false;
+        let Data;
+
         try {
           let parsed = JSON.parse(body);
-          resolve(parsed);
+          let success = parsed.HttpCode == 200;
+
+          if (!success) {
+            _Error = new Error(parsed.Message);
+          }
         } catch (err) {
-          resolve({
-            HttpCode: 0,
-            Message: "Delete: Error parsing api response",
-          });
+          _Error = err;
+          IsLocalError = true;
         }
+
+        resolve({
+          HttpResponse,
+          Error: _Error,
+          IsLocalError,
+          Data,
+        });
       };
 
       request(url, options, handle);
