@@ -48,8 +48,12 @@ const CDN = new BunnyStorageClient({
 async function ListMyStorageRootFolder() {
   let RootFiles = await CDN.List(".");
 
-  for (const File of RootFiles) {
-    console.log(`Name: ${File.ObjectName} Size: ${File.Length}`);
+  if (RootFiles.Data) {
+    for (const File of RootFiles.Data) {
+      console.log(`Name: ${File.ObjectName} Size: ${File.Length}`);
+    }
+  } else if (RootFiles.Error) {
+    console.log(RootFiles.Error);
   }
 }
 
@@ -62,34 +66,20 @@ ListMyStorageRootFolder();
 async function SaveMyAssetsLocally() {
   let AssetsFiles = await CDN.List("Assets");
 
-  for (const File of AssetsFiles) {
-    await CDN.Download("Assets", File.ObjectName);
-    // Saved at: downloads/Assets
+  if (AssetsFiles.Data) {
 
-    // OR
+    for (const File of AssetsFiles.Data) {
+      await CDN.Download("Assets", File.ObjectName);
+      // Saved at: downloads/Assets
+  
+      // OR
+  
+      await CDN.Download("Assets", File.ObjectName, "media", File.ObjectName);
+      // Saved at: media
+    }
 
-    await CDN.Download("Assets", File.ObjectName, "media", File.ObjectName);
-    // Saved at: media
-  }
-}
-
-SaveMyAssetsLocally();
-```
-
-# Download Usage
-
-```js
-async function SaveMyAssetsLocally() {
-  let AssetsFiles = await CDN.List("Assets");
-
-  for (const File of AssetsFiles) {
-    await CDN.Download("Assets", File.ObjectName);
-    // Saved at: downloads/Assets
-
-    // OR
-
-    await CDN.Download("Assets", File.ObjectName, "media", File.ObjectName);
-    // Saved at: media
+  } else if (AssetsFiles.Error) {
+    console.log(AssetsFiles.Error);
   }
 }
 
@@ -130,7 +120,7 @@ async function ClearMyRemoteAssetsFolder() {
       }
     }
   } else if (AssetsFiles.Error) {
-    console.log("Get assets files failed");
+    console.log(AssetsFiles.Error);
   }
 }
 
