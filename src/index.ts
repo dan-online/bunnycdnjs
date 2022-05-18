@@ -10,6 +10,7 @@ import {
 
 const LocationsEndpoints = {
   Main: "https://storage.bunnycdn.com",
+  Uk: "https://uk.storage.bunnycdn.com",
   Falkenstein: "https://storage.bunnycdn.com",
   "New York": "https://ny.storage.bunnycdn.com",
   "Los Angeles": "https://la.storage.bunnycdn.com",

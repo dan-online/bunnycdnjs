@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -55,6 +59,7 @@ var request_1 = __importDefault(require("request"));
 var path_1 = __importDefault(require("path"));
 var LocationsEndpoints = {
     Main: "https://storage.bunnycdn.com",
+    Uk: "https://uk.storage.bunnycdn.com",
     Falkenstein: "https://storage.bunnycdn.com",
     "New York": "https://ny.storage.bunnycdn.com",
     "Los Angeles": "https://la.storage.bunnycdn.com",
@@ -73,7 +78,7 @@ var BunnyStorageClient = /** @class */ (function () {
             var url;
             var _this = this;
             return __generator(this, function (_a) {
-                url = this.endpoint + "/" + this.storageZoneName + "/" + path + "/";
+                url = "".concat(this.endpoint, "/").concat(this.storageZoneName, "/").concat(path, "/");
                 return [2 /*return*/, new Promise(function (resolve) {
                         var options = {
                             method: "GET",
@@ -112,7 +117,7 @@ var BunnyStorageClient = /** @class */ (function () {
             var url;
             var _this = this;
             return __generator(this, function (_a) {
-                url = this.endpoint + "/" + this.storageZoneName + "/" + path + "/" + filename;
+                url = "".concat(this.endpoint, "/").concat(this.storageZoneName, "/").concat(path, "/").concat(filename);
                 return [2 /*return*/, new Promise(function (resolve) {
                         var options = {
                             method: "PUT",
@@ -151,7 +156,7 @@ var BunnyStorageClient = /** @class */ (function () {
             var url, toSavePath, toSaveFilename, toSaveFullPath;
             var _this = this;
             return __generator(this, function (_a) {
-                url = this.endpoint + "/" + this.storageZoneName + "/" + path + "/" + filename;
+                url = "".concat(this.endpoint, "/").concat(this.storageZoneName, "/").concat(path, "/").concat(filename);
                 toSavePath = "downloads";
                 toSaveFilename = "untitled";
                 if (outputFilePath && outputFileName) {
@@ -197,7 +202,7 @@ var BunnyStorageClient = /** @class */ (function () {
             var url;
             var _this = this;
             return __generator(this, function (_a) {
-                url = this.endpoint + "/" + this.storageZoneName + "/" + path + "/" + filename;
+                url = "".concat(this.endpoint, "/").concat(this.storageZoneName, "/").concat(path, "/").concat(filename);
                 return [2 /*return*/, new Promise(function (resolve) {
                         var options = {
                             method: "DELETE",
